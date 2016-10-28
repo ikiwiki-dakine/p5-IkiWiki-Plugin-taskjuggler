@@ -7,7 +7,6 @@ use File::Temp qw (tempdir);
 use File::Spec;
 use File::Find;
 use Encode;
-use IkiWiki::Plugin::mdwn;
 
 sub import {
 	hook(type => "getsetup", id => "tjp", call => \&getsetup);
