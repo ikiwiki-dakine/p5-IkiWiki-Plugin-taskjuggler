@@ -62,7 +62,7 @@ sub htmlize(@) {
 
 	find($copy_to_page, $tmpdir);
 
-	my $all_html = join "\n", map { qq|<a name="$_"></a>\n| . $html{$_} } @reports;
+	my $all_html = join "\n", map { exists $html{$_} ? qq|<a name="$_"></a>\n| . $html{$_} : "" } @reports;
 	for my $report_name (@reports) {
 		$all_html =~ s/$report_name.html/#$report_name/sg;
 	}
