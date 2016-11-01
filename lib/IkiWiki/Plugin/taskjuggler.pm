@@ -29,7 +29,7 @@ sub htmlize(@) {
 	my $content = $params{content};
 	my $destdir = File::Spec->rel2abs($config{destdir});
 
-	my $tmpdir = tempdir ('tjp.XXXXXXXXXX', TMPDIR => 1, CLEANUP => 0);
+	my $tmpdir = tempdir ('tjp.XXXXXXXXXX', TMPDIR => 1, CLEANUP => 1);
 
 	my $page_filename = File::Spec->rel2abs(srcfile($page), $config{srcdir});
 	my ($filename) = grep { -f $_ }  map { "$_.tjp" } ( $page_filename, "$page_filename/index" );
