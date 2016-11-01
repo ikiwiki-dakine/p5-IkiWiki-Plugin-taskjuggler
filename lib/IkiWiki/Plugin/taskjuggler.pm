@@ -31,17 +31,35 @@ sub htmlize(@) {
 
 	my $tmpdir = tempdir ('tjp.XXXXXXXXXX', TMPDIR => 1, CLEANUP => 0);
 
-	my $filename = 'build.tjp';
+	my $page_filename = File::Spec->rel2abs(srcfile($page), $config{srcdir});
+	my ($filename) = grep { -f $_ }  map { "$_.tjp" } ( $page_filename, "$page_filename/index" );
 
 	# Bring back linking... this is major hack.
 	# Figure out how to turn off [[...]] linking in ikiwiki
 	$content =~ s,<span class="createlink">(?<name>[^>]*?)</span>,[[$+{name}]],sg;
 
-	writefile($filename, $tmpdir, $content);
-	my @reports = grep { length $_ > 0 } ($content =~ /textreport.*?"([^"]*?)"/g);
+	# Read in a list of all the reports
+	open my $reports_fh, '-|', qw(tj3 --no-reports --list-reports .),  $filename;
+	my @reports_output_all;
+	chomp, push @reports_output_all, $_ while(<$reports_fh>);
+
+	# Get metadata out of the report list output
+	my @reports_output;
+	while( @reports_output_all ) {
+		my $current = pop @reports_output_all;
+		last if( $current =~ /^Checking/ );
+		my ($path, $format, $name) = split ' ', $current, 3;
+		unshift @reports_output, {
+			path => $path,
+			format => $format,
+			name => $name,
+		};
+	}
+	my @reports = map { $_->{name} } grep { $_->{format} eq 'html' } @reports_output;
+
 	system( qw(tj3),
 		qw(--output-dir), $tmpdir,
-		File::Spec->catfile($tmpdir, $filename) );
+		$filename );
 
 	my %html = ();
 	my $copy_to_page = sub {
