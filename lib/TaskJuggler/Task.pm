@@ -5,6 +5,23 @@ use MooX::HandlesVia;
 
 use constant NAME_ID_ITEM => qr/ (?<name> .*?) [ ] \( (?<id> [^)]+ ) \) /x;
 
+=attr data
+
+C<id>, C<has_id>
+
+C<duration>, C<has_duration>
+
+C<effort>, C<has_effort>
+
+C<name>, C<has_name>
+
+C<start>, C<has_start>
+
+C<end>, C<has_end>
+
+
+=cut
+
 has data => (
 	is => 'rw',
 	trigger => 1,
@@ -18,9 +35,18 @@ has data => (
 				"has_${key_lc}"  => [ 'exists', $key ],
 			);
 		 } ( qw(Id Duration Effort Name Start End) ),
-		 'data_headers' => [ 'keys' ],
 	},
 );
+
+=func data_headers
+
+Returns an ArrayRef of the keys in the C<data> attribute.
+
+=cut
+sub data_headers {
+	my ($self) = @_;
+	[ keys %{ $self->data } ];
+}
 
 sub _trigger_data {
 	my ($self) = @_;
@@ -29,6 +55,15 @@ sub _trigger_data {
 	$self->data->{Name} =~ s/^\s+//g;
 }
 
+=attr
+
+C<children_ids>
+
+C<precursor_ids>
+
+C<resource_ids>
+
+=cut
 has [qw( children_ids precursor_ids resource_ids )] => (
 	is => 'lazy',
 );
