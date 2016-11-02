@@ -17,10 +17,8 @@ has data => (
 				$key_lc          => [ 'get', $key ],
 				"has_${key_lc}"  => [ 'exists', $key ],
 			);
-		 } ( qw(Id Duration Effort Name Start End) )
-		#Children     "Navigation (curie.nav), v0.002 (curie.m0_002), v0.003 (curie.m0_003), v0.004 (curie.m0_004)",
-		#Precursors   "",
-		#Resources    "",
+		 } ( qw(Id Duration Effort Name Start End) ),
+		 'data_headers' => [ 'keys' ],
 	},
 );
 
