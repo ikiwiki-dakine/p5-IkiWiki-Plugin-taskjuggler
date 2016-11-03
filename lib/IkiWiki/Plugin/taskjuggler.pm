@@ -80,6 +80,26 @@ sub htmlize(@) {
 
 	find($copy_to_page, $tmpdir);
 
+	my $remove_css = 0;
+	for my $report (@html{@reports}) {
+		if( $remove_css ) {
+			$report =~ s/<link [^>]*? \Qtjreport.css\E [^>]*? >//xsg;
+		} else {
+			my $insert = <<HTML;
+			<style type="text/css">
+			.tj_page table {
+				border-collapse: initial !important;
+				margin-bottom: 0em !important;
+			}
+			.tj_page th, .tj_page td {
+				border: 0px !important;
+			}
+			</style>
+HTML
+			$report =~ s/(<link [^>]*? \Qtjreport.css\E [^>]*? >)/$1\n$insert/xsg;
+			$remove_css = 1;
+		}
+	}
 	my $all_html = join "\n", map { exists $html{$_} ? qq|<a name="$_"></a>\n| . $html{$_} : "" } @reports;
 	for my $report_name (@reports) {
 		$all_html =~ s/$report_name.html/#$report_name/sg;
