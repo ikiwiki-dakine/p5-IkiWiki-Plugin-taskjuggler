@@ -57,6 +57,8 @@ sub htmlize(@) {
 	}
 	my @reports = map { $_->{name} } grep { $_->{format} eq 'html' } @reports_output;
 
+	die "No HTML reports in TaskJuggler file $page" unless @reports;
+
 	system( qw(tj3),
 		qw(--output-dir), $tmpdir,
 		$filename );
@@ -100,7 +102,17 @@ HTML
 			$remove_css = 1;
 		}
 	}
+
+	my ($h1) = (values %html)[0] =~ m,(<h1 [^>]*? > [^<]*? </h1>),xs;
+	for my $report (values %html) {
+		$report =~ s/\Q$h1\E//g;
+	}
+
 	my $all_html = join "\n", map { exists $html{$_} ? qq|<a name="$_"></a>\n| . $html{$_} : "" } @reports;
+
+	# prefix with header
+	$all_html = $h1 . $all_html;
+
 	for my $report_name (@reports) {
 		$all_html =~ s/$report_name.html/#$report_name/sg;
 	}
