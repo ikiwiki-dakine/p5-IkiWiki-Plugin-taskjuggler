@@ -114,7 +114,7 @@ HTML
 	$all_html = $h1 . $all_html;
 
 	for my $report_name (@reports) {
-		$all_html =~ s/$report_name.html/#$report_name/sg;
+		$all_html =~ s/\Q$report_name.html\E/#$report_name/sg;
 	}
 	return $all_html;
 }
