@@ -113,6 +113,29 @@ HTML
 	# prefix with header
 	$all_html = $h1 . $all_html;
 
+	my $inline_style = "height: 1.3em; vertical-align: bottom;"; # only be a line-height equivalent so that the tables line up
+	# Get GitHub issue/pull badges
+	$all_html =~ s,
+		<a \s+
+		href
+			= "
+				http[s]?://github.com/(?<important>[^/]+?/[^/]+?/(?:issues|pull)/\d+?)
+			">
+		[^<]+?
+		</a>
+		,<a href="https://github.com/$+{important}"><img style="$inline_style" src="https://github-shields.com/github/$+{important}.svg"/></a>,xmsg;
+
+	# Get GitHub user avatars
+	$all_html =~ s,
+		<a \s+
+		href
+			= "
+				http[s]?://github.com/(?<important>[^/]+?)
+			">
+		[^<]+?
+		</a>
+		,<a href="https://github.com/$+{important}"><img style="$inline_style" src="https://github.com/$+{important}.png?size=50"/></a>,xmsg;
+
 	for my $report_name (@reports) {
 		$all_html =~ s/\Q$report_name.html\E/#$report_name/sg;
 	}
