@@ -13,8 +13,6 @@ C<duration>, C<has_duration>
 
 C<effort>, C<has_effort>
 
-C<name>, C<has_name>
-
 C<start>, C<has_start>
 
 C<end>, C<has_end>
@@ -34,9 +32,25 @@ has data => (
 				$key_lc          => [ 'get', $key ],
 				"has_${key_lc}"  => [ 'exists', $key ],
 			);
-		 } ( qw(Id Duration Effort Name Start End) ),
+		 } ( qw( Duration Effort End Id Name Start ) ),
 	},
 );
+
+=attr depth
+
+C<depth>, C<has_depth>
+
+=cut
+has depth => (
+	is => 'lazy',
+);
+
+sub _build_depth {
+	my ($self) = @_;
+	# Each . represents the level of the child in the task tree
+	my $count = () = $self->data->{Id} =~ /(\.)/g;
+	$count;
+}
 
 =func data_headers
 
