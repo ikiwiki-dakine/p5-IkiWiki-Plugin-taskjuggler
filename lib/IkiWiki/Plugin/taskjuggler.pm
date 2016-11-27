@@ -8,6 +8,9 @@ use File::Spec;
 use File::Find;
 use Encode;
 
+# only be a line-height equivalent so that the tables line up
+use constant GH_SHIELD_INLINE_STYLE => "height: 1.3em; vertical-align: bottom;";
+
 sub import {
 	hook(type => "getsetup", id => "tjp", call => \&getsetup);
 	hook(type => "htmlize", id => "tjp", call => \&htmlize);
@@ -113,7 +116,6 @@ HTML
 	# prefix with header
 	$all_html = $h1 . $all_html;
 
-	my $inline_style = "height: 1.3em; vertical-align: bottom;"; # only be a line-height equivalent so that the tables line up
 	# Get GitHub issue/pull badges
 	$all_html =~ s,
 		<a \s+
@@ -123,7 +125,7 @@ HTML
 			">
 		[^<]+?
 		</a>
-		,<a href="https://github.com/$+{important}"><img style="$inline_style" src="https://github-shields.com/github/$+{important}.svg"/></a>,xmsg;
+		,github_issue_shield($+{important}),xmsge;
 
 	# Get GitHub user avatars
 	$all_html =~ s,
@@ -134,12 +136,28 @@ HTML
 			">
 		[^<]+?
 		</a>
-		,<a href="https://github.com/$+{important}"><img style="$inline_style" src="https://github.com/$+{important}.png?size=50"/></a>,xmsg;
+		,github_username_shield($+{important}),xmsge;
 
 	for my $report_name (@reports) {
 		$all_html =~ s/\Q$report_name.html\E/#$report_name/sg;
 	}
 	return $all_html;
+}
+
+sub github_issue_shield {
+	my ($issue_id) = @_;
+	return
+		qq|<a href="https://github.com/$issue_id">|.
+			qq|<img style="@{[ GH_SHIELD_INLINE_STYLE ]}" src="https://github-shields.com/github/$issue_id.svg"/>|.
+		qq|</a>|;
+}
+
+sub github_username_shield {
+	my ($username) = @_;
+	return
+		qq|<a href="https://github.com/$username">|.
+			qq|<img style="@{[ GH_SHIELD_INLINE_STYLE ]}" src="https://github.com/$username.png?size=50"/>|.
+		qq|</a>|;
 }
 
 1;
